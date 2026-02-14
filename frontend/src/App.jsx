@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -53,11 +54,12 @@ const AuthRoute = ({ children }) => {
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          {/* Auth Routes */}
-          <Route
-            path="/login"
+      <ThemeProvider>
+        <AuthProvider>
+          <Routes>
+            {/* Auth Routes */}
+            <Route
+              path="/login"
             element={
               <AuthRoute>
                 <Login />
@@ -90,10 +92,11 @@ function App() {
             <Route path="settings" element={<Settings />} />
           </Route>
 
-          {/* Catch all */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </AuthProvider>
+            {/* Catch all */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

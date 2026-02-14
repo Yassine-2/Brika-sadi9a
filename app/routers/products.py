@@ -1,6 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
+import io
+import base64
+import uuid
 
 from app.database import get_db
 from app.models import Product, ProductPosition, User, ThresholdStatus
@@ -13,21 +16,46 @@ from app.auth import require_business_mode
 router = APIRouter(prefix="/products", tags=["Products - Business Mode"])
 
 
+def generate_qr_code(data: str) -> str:
+    """Generate a QR code and return as base64 data URL"""
+    try:
+        import qrcode
+        from qrcode.main import QRCode
+        from qrcode.constants import ERROR_CORRECT_L
+        
+        qr = QRCode(
+            version=1,
+            error_correction=ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(data)
+        qr.make(fit=True)
+        
+        img = qr.make_image(fill_color="black", back_color="white")
+        
+        # Convert to base64
+        buffer = io.BytesIO()
+        img.save(buffer, format='PNG')
+        buffer.seek(0)
+        img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+        
+        return f"data:image/png;base64,{img_base64}"
+    except ImportError:
+        # If qrcode not available, return None
+        return None
+
+
 @router.post("/", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
 def create_product(
     product: ProductCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_business_mode)
 ):
-    """Create a new product"""
-    # Check if QR code already exists
-    if product.qr_code:
-        existing = db.query(Product).filter(Product.qr_code == product.qr_code).first()
-        if existing:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Product with this QR code already exists"
-            )
+    """Create a new product with auto-generated QR code"""
+    # Generate unique QR code identifier
+    qr_code_id = f"PROD-{uuid.uuid4().hex[:8].upper()}"
+    qr_code_image = generate_qr_code(qr_code_id)
     
     # Determine threshold status
     threshold_status = ThresholdStatus.BELOW if product.quantity < product.threshold else ThresholdStatus.ENOUGH
@@ -36,7 +64,8 @@ def create_product(
     db_product = Product(
         name=product.name,
         image=product.image,
-        qr_code=product.qr_code,
+        qr_code=qr_code_id,
+        qr_code_image=qr_code_image,
         quantity=product.quantity,
         threshold=product.threshold,
         threshold_status=threshold_status

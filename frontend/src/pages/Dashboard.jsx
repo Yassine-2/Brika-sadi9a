@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Plus, AlertTriangle, Package, ArrowRight } from 'lucide-react';
+import { Plus, AlertTriangle, Package, ArrowRight, X } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
 import { productsAPI, tasksAPI } from '../services/api';
+import AddTaskModal from '../components/AddTaskModal';
 import '../styles/dashboard.css';
 
 const Dashboard = () => {
@@ -9,6 +10,8 @@ const Dashboard = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lowStockProducts, setLowStockProducts] = useState([]);
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [selectedPosition, setSelectedPosition] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -43,16 +46,20 @@ const Dashboard = () => {
 
   // Mock warehouse map positions
   const warehousePositions = [
-    { id: 'A1', x: 10, y: 10, filled: 80 },
-    { id: 'A2', x: 35, y: 10, filled: 45 },
-    { id: 'A3', x: 60, y: 10, filled: 100 },
-    { id: 'B1', x: 10, y: 40, filled: 20 },
-    { id: 'B2', x: 35, y: 40, filled: 60 },
-    { id: 'B3', x: 60, y: 40, filled: 0 },
-    { id: 'C1', x: 10, y: 70, filled: 90 },
-    { id: 'C2', x: 35, y: 70, filled: 30 },
-    { id: 'C3', x: 60, y: 70, filled: 55 },
+    { id: 'A1', uniqueId: 'WH-A1-001', x: 10, y: 10, filled: 80, products: ['Widget A', 'Widget B'] },
+    { id: 'A2', uniqueId: 'WH-A2-002', x: 35, y: 10, filled: 45, products: ['Gadget X'] },
+    { id: 'A3', uniqueId: 'WH-A3-003', x: 60, y: 10, filled: 100, products: ['Component Y', 'Part Z'] },
+    { id: 'B1', uniqueId: 'WH-B1-004', x: 10, y: 40, filled: 20, products: ['Item C'] },
+    { id: 'B2', uniqueId: 'WH-B2-005', x: 35, y: 40, filled: 60, products: ['Product D'] },
+    { id: 'B3', uniqueId: 'WH-B3-006', x: 60, y: 40, filled: 0, products: [] },
+    { id: 'C1', uniqueId: 'WH-C1-007', x: 10, y: 70, filled: 90, products: ['Item E', 'Item F'] },
+    { id: 'C2', uniqueId: 'WH-C2-008', x: 35, y: 70, filled: 30, products: ['Product G'] },
+    { id: 'C3', uniqueId: 'WH-C3-009', x: 60, y: 70, filled: 55, products: ['Component H'] },
   ];
+
+  const handlePositionClick = (position) => {
+    setSelectedPosition(position);
+  };
 
   const getPositionColor = (filled) => {
     if (filled === 0) return 'rgba(148, 163, 184, 0.2)';
@@ -72,17 +79,24 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      {/* Header */}
       <div className="page-header">
         <div>
           <h1 className="page-title">Dashboard</h1>
           <p className="page-subtitle">Warehouse overview and management</p>
         </div>
-        <button className="btn btn-primary">
+        <button className="btn btn-primary" onClick={() => setShowTaskModal(true)}>
           <Plus size={20} />
           Add Task
         </button>
       </div>
+
+      {/* Add Task Modal */}
+      <AddTaskModal
+        isOpen={showTaskModal}
+        onClose={() => setShowTaskModal(false)}
+        products={products}
+        onTaskCreated={loadData}
+      />
 
       {/* Low Stock Alert */}
       {lowStockProducts.length > 0 && (
@@ -128,7 +142,12 @@ const Dashboard = () => {
           <div className="warehouse-map">
             <svg viewBox="0 0 100 100" className="map-svg">
               {warehousePositions.map(pos => (
-                <g key={pos.id}>
+                <g 
+                  key={pos.id} 
+                  className="map-position"
+                  onClick={() => handlePositionClick(pos)}
+                  style={{ cursor: 'pointer' }}
+                >
                   <rect
                     x={pos.x}
                     y={pos.y}
@@ -136,8 +155,9 @@ const Dashboard = () => {
                     height="20"
                     rx="3"
                     fill={getPositionColor(pos.filled)}
-                    stroke="rgba(148, 163, 184, 0.3)"
-                    strokeWidth="0.5"
+                    stroke={selectedPosition?.id === pos.id ? '#a855f7' : 'rgba(148, 163, 184, 0.3)'}
+                    strokeWidth={selectedPosition?.id === pos.id ? '1.5' : '0.5'}
+                    className="position-rect"
                   />
                   <text
                     x={pos.x + 10}
@@ -152,6 +172,36 @@ const Dashboard = () => {
                 </g>
               ))}
             </svg>
+            
+            {/* Position Details Popup */}
+            {selectedPosition && (
+              <div className="position-popup">
+                <div className="popup-header">
+                  <h4>Position {selectedPosition.id}</h4>
+                  <button className="popup-close" onClick={() => setSelectedPosition(null)}>
+                    <X size={16} />
+                  </button>
+                </div>
+                <div className="popup-content">
+                  <div className="popup-row">
+                    <span className="popup-label">Unique ID:</span>
+                    <span className="popup-value">{selectedPosition.uniqueId}</span>
+                  </div>
+                  <div className="popup-row">
+                    <span className="popup-label">Capacity Used:</span>
+                    <span className="popup-value">{selectedPosition.filled}%</span>
+                  </div>
+                  <div className="popup-row">
+                    <span className="popup-label">Products:</span>
+                    <span className="popup-value">
+                      {selectedPosition.products.length > 0 
+                        ? selectedPosition.products.join(', ') 
+                        : 'Empty'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

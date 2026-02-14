@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Package, AlertCircle, CheckCircle } from 'lucide-react';
 import { productsAPI } from '../services/api';
+import AddProductModal from '../components/AddProductModal';
 import '../styles/products.css';
 
 const Products = () => {
@@ -9,6 +10,7 @@ const Products = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showProductModal, setShowProductModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -62,11 +64,18 @@ const Products = () => {
           <h1 className="page-title">Products</h1>
           <p className="page-subtitle">Manage your warehouse inventory</p>
         </div>
-        <button className="btn btn-primary">
+        <button className="btn btn-primary" onClick={() => setShowProductModal(true)}>
           <Plus size={20} />
           Add Product
         </button>
       </div>
+
+      {/* Add Product Modal */}
+      <AddProductModal
+        isOpen={showProductModal}
+        onClose={() => setShowProductModal(false)}
+        onProductCreated={loadProducts}
+      />
 
       {/* Search Bar */}
       <div className="search-bar">

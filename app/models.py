@@ -72,7 +72,8 @@ class Product(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False, index=True)  # noun/name of the product
     image = Column(Text, nullable=True)  # URL or base64 encoded image
-    qr_code = Column(String(500), unique=True, nullable=True)  # QR code data
+    qr_code = Column(String(500), unique=True, nullable=True)  # QR code identifier
+    qr_code_image = Column(Text, nullable=True)  # QR code image as base64 data URL
     quantity = Column(Integer, default=0)
     threshold = Column(Integer, default=10)  # Minimum quantity threshold
     threshold_status = Column(Enum(ThresholdStatus), default=ThresholdStatus.ENOUGH)

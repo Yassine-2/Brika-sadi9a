@@ -67,7 +67,6 @@ Content-Type: application/json
 {
     "name": "Widget A",
     "image": "https://example.com/widget-a.jpg",
-    "qr_code": "WIDGET-A-001",
     "quantity": 100,
     "threshold": 20,
     "positions": [

@@ -124,9 +124,17 @@ const ProductDetail = () => {
           {/* QR Code */}
           {product.qr_code && (
             <div className="qr-section">
-              <div className="qr-icon">
-                <QrCode size={32} />
-              </div>
+              {product.qr_code_image ? (
+                <img 
+                  src={product.qr_code_image} 
+                  alt="QR Code" 
+                  className="qr-image"
+                />
+              ) : (
+                <div className="qr-icon">
+                  <QrCode size={32} />
+                </div>
+              )}
               <div className="qr-info">
                 <span className="qr-label">QR Code</span>
                 <span className="qr-value">{product.qr_code}</span>

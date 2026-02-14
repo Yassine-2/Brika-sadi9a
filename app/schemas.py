@@ -101,6 +101,7 @@ class ProductUpdate(BaseModel):
 
 class ProductResponse(ProductBase):
     id: int
+    qr_code_image: Optional[str] = None
     threshold_status: ThresholdStatus
     positions: List[ProductPositionResponse]
     created_at: datetime

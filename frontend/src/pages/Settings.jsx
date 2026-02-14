@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { 
   User, 
   Bell, 
@@ -14,6 +15,7 @@ import '../styles/settings.css';
 
 const Settings = () => {
   const { user } = useAuth();
+  const { themeMode, setThemeMode } = useTheme();
   const [activeSection, setActiveSection] = useState('profile');
 
   const sections = [
@@ -191,15 +193,24 @@ const Settings = () => {
                 <div className="theme-selector">
                   <label>Theme</label>
                   <div className="theme-options">
-                    <button className="theme-option active">
+                    <button 
+                      className={`theme-option ${themeMode === 'dark' ? 'active' : ''}`}
+                      onClick={() => setThemeMode('dark')}
+                    >
                       <div className="theme-preview dark"></div>
                       <span>Dark</span>
                     </button>
-                    <button className="theme-option">
+                    <button 
+                      className={`theme-option ${themeMode === 'light' ? 'active' : ''}`}
+                      onClick={() => setThemeMode('light')}
+                    >
                       <div className="theme-preview light"></div>
                       <span>Light</span>
                     </button>
-                    <button className="theme-option">
+                    <button 
+                      className={`theme-option ${themeMode === 'system' ? 'active' : ''}`}
+                      onClick={() => setThemeMode('system')}
+                    >
                       <div className="theme-preview system"></div>
                       <span>System</span>
                     </button>

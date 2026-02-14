@@ -10,7 +10,7 @@
 .auth-background {
   position: fixed;
   inset: 0;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
   z-index: -1;
 }
 
@@ -24,9 +24,9 @@
 }
 
 .auth-card {
-  background: rgba(30, 41, 59, 0.8);
+  background: var(--bg-card);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(148, 163, 184, 0.1);
+  border: 1px solid var(--border-color);
   border-radius: 24px;
   padding: 3rem;
   width: 100%;
@@ -61,13 +61,13 @@
 .auth-header h1 {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
   letter-spacing: -0.025em;
 }
 
 .auth-header p {
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 0.95rem;
 }
 
@@ -86,22 +86,22 @@
 .form-group label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #cbd5e1;
+  color: var(--text-secondary);
 }
 
 .form-group input {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(148, 163, 184, 0.15);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 0.875rem 1rem;
   font-size: 1rem;
-  color: #f8fafc;
+  color: var(--text-primary);
   transition: all 0.2s ease;
   width: 100%;
 }
 
 .form-group input::placeholder {
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .form-group input:focus {
