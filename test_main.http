@@ -1,0 +1,324 @@
+# Smart Warehouse API Tests
+# Base URL
+@baseUrl = http://127.0.0.1:8000
+
+### Health Check
+GET {{baseUrl}}/health
+Accept: application/json
+
+### Root
+GET {{baseUrl}}/
+Accept: application/json
+
+### ============ AUTHENTICATION ============
+
+### Register User (Business Mode)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "username": "warehouse_admin",
+    "email": "admin@warehouse.com",
+    "password": "securepassword123",
+    "modes": ["business"]
+}
+
+### Register User (Both Modes)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "username": "super_admin",
+    "email": "super@warehouse.com",
+    "password": "securepassword123",
+    "modes": ["business", "industrial"]
+}
+
+### Login (Form Data)
+POST {{baseUrl}}/auth/login
+Content-Type: application/x-www-form-urlencoded
+
+username=warehouse_admin&password=securepassword123
+
+### Login (JSON)
+POST {{baseUrl}}/auth/login/json
+Content-Type: application/json
+
+{
+    "username": "warehouse_admin",
+    "password": "securepassword123"
+}
+
+### Get Current User (Replace TOKEN with actual token)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer TOKEN
+
+### Get User Modes
+GET {{baseUrl}}/auth/modes
+Authorization: Bearer TOKEN
+
+### ============ PRODUCTS ============
+
+### Create Product
+POST {{baseUrl}}/products/
+Authorization: Bearer TOKEN
+Content-Type: application/json
+
+{
+    "name": "Widget A",
+    "image": "https://example.com/widget-a.jpg",
+    "qr_code": "WIDGET-A-001",
+    "quantity": 100,
+    "threshold": 20,
+    "positions": [
+        {"position": "Shelf-A1", "percentage": 60.0},
+        {"position": "Shelf-B2", "percentage": 40.0}
+    ]
+}
+
+### Create Another Product
+POST {{baseUrl}}/products/
+Authorization: Bearer TOKEN
+Content-Type: application/json
+
+{
+    "name": "Gadget B",
+    "qr_code": "GADGET-B-001",
+    "quantity": 5,
+    "threshold": 10,
+    "positions": [
+        {"position": "Shelf-C3", "percentage": 100.0}
+    ]
+}
+
+### Get All Products
+GET {{baseUrl}}/products/
+Authorization: Bearer TOKEN
+
+### Get Products Below Threshold
+GET {{baseUrl}}/products/?below_threshold=true
+Authorization: Bearer TOKEN
+
+### Get Product by ID
+GET {{baseUrl}}/products/1
+Authorization: Bearer TOKEN
+
+### Get Product by QR Code
+GET {{baseUrl}}/products/qr/WIDGET-A-001
+Authorization: Bearer TOKEN
+
+### Update Product
+PUT {{baseUrl}}/products/1
+Authorization: Bearer TOKEN
+Content-Type: application/json
+
+{
+    "quantity": 150,
+    "positions": [
+        {"position": "Shelf-A1", "percentage": 70.0},
+        {"position": "Shelf-B2", "percentage": 30.0}
+    ]
+}
+
+### Update Product Quantity (Add 50)
+PUT {{baseUrl}}/products/1/quantity?quantity_change=50
+Authorization: Bearer TOKEN
+
+### Update Product Quantity (Remove 30)
+PUT {{baseUrl}}/products/1/quantity?quantity_change=-30
+Authorization: Bearer TOKEN
+
+### Add Position to Product
+POST {{baseUrl}}/products/1/positions
+Authorization: Bearer TOKEN
+Content-Type: application/json
+
+{
+    "position": "Shelf-D4",
+    "percentage": 15.0
+}
+
+### Delete Product
+DELETE {{baseUrl}}/products/1
+Authorization: Bearer TOKEN
+
+### ============ TASKS ============
+
+### Create Task
+POST {{baseUrl}}/tasks/
+Authorization: Bearer TOKEN
+Content-Type: application/json
+
+{
+    "title": "Restock Widgets",
+    "description": "Restock Widget A in warehouse section A",
+    "items": [
+        {
+            "product_id": 1,
+            "quantity_needed": 50,
+            "task_type": "in"
+        }
+    ]
+}
+
+### Create Task with Multiple Items
+POST {{baseUrl}}/tasks/
+Authorization: Bearer TOKEN
+Content-Type: application/json
+
+{
+    "title": "Order Fulfillment #1234",
+    "description": "Pick items for customer order",
+    "items": [
+        {
+            "product_id": 1,
+            "quantity_needed": 10,
+            "task_type": "out"
+        },
+        {
+            "product_id": 2,
+            "quantity_needed": 5,
+            "task_type": "out"
+        }
+    ]
+}
+
+### Get All Tasks
+GET {{baseUrl}}/tasks/
+Authorization: Bearer TOKEN
+
+### Get Ongoing Tasks
+GET {{baseUrl}}/tasks/?state=ongoing
+Authorization: Bearer TOKEN
+
+### Get Finished Tasks
+GET {{baseUrl}}/tasks/?state=finished
+Authorization: Bearer TOKEN
+
+### Get Task by ID
+GET {{baseUrl}}/tasks/1
+Authorization: Bearer TOKEN
+
+### Update Task
+PUT {{baseUrl}}/tasks/1
+Authorization: Bearer TOKEN
+Content-Type: application/json
+
+{
+    "title": "Updated Task Title",
+    "description": "Updated description"
+}
+
+### Add Item to Task
+POST {{baseUrl}}/tasks/1/items
+Authorization: Bearer TOKEN
+Content-Type: application/json
+
+{
+    "product_id": 2,
+    "quantity_needed": 20,
+    "task_type": "in"
+}
+
+### Update Task Item
+PUT {{baseUrl}}/tasks/1/items/1
+Authorization: Bearer TOKEN
+Content-Type: application/json
+
+{
+    "quantity_needed": 25,
+    "state": "ongoing"
+}
+
+### Complete Task Item (Updates product quantity)
+POST {{baseUrl}}/tasks/1/items/1/complete
+Authorization: Bearer TOKEN
+
+### Delete Task Item
+DELETE {{baseUrl}}/tasks/1/items/1
+Authorization: Bearer TOKEN
+
+### Delete Task
+DELETE {{baseUrl}}/tasks/1
+Authorization: Bearer TOKEN
+
+### ============ RASPBERRY PI ============
+
+### Register Raspberry Pi Device
+POST {{baseUrl}}/raspberry-pi/devices
+Authorization: Bearer TOKEN
+Content-Type: application/json
+
+{
+    "device_id": "rpi-warehouse-001",
+    "name": "Warehouse Scanner 1",
+    "ip_address": "192.168.1.100",
+    "location": "Warehouse Section A"
+}
+
+### Register Another Device
+POST {{baseUrl}}/raspberry-pi/devices
+Authorization: Bearer TOKEN
+Content-Type: application/json
+
+{
+    "device_id": "rpi-warehouse-002",
+    "name": "Warehouse Scanner 2",
+    "ip_address": "192.168.1.101",
+    "location": "Warehouse Section B"
+}
+
+### Get All Devices
+GET {{baseUrl}}/raspberry-pi/devices
+Authorization: Bearer TOKEN
+
+### Get Online Devices Only
+GET {{baseUrl}}/raspberry-pi/devices?online_only=true
+Authorization: Bearer TOKEN
+
+### Get Device by ID
+GET {{baseUrl}}/raspberry-pi/devices/rpi-warehouse-001
+Authorization: Bearer TOKEN
+
+### Update Device
+PUT {{baseUrl}}/raspberry-pi/devices/rpi-warehouse-001
+Authorization: Bearer TOKEN
+Content-Type: application/json
+
+{
+    "name": "Main Warehouse Scanner",
+    "location": "Warehouse Section A - Main Entrance"
+}
+
+### Send Command to Device
+POST {{baseUrl}}/raspberry-pi/command
+Authorization: Bearer TOKEN
+Content-Type: application/json
+
+{
+    "device_id": "rpi-warehouse-001",
+    "command": "scan_qr",
+    "parameters": {
+        "timeout": 30
+    }
+}
+
+### Send LED Command to Device
+POST {{baseUrl}}/raspberry-pi/command
+Authorization: Bearer TOKEN
+Content-Type: application/json
+
+{
+    "device_id": "rpi-warehouse-001",
+    "command": "set_led",
+    "parameters": {
+        "color": "green",
+        "duration": 5
+    }
+}
+
+### Delete Device
+DELETE {{baseUrl}}/raspberry-pi/devices/rpi-warehouse-001
+Authorization: Bearer TOKEN
+
+###
