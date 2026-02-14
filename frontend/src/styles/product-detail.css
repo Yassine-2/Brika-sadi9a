@@ -1,0 +1,379 @@
+.product-detail {
+  max-width: 1200px;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  margin-bottom: 1.5rem;
+  transition: color 0.2s ease;
+}
+
+.back-button:hover {
+  color: #f8fafc;
+}
+
+.product-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  grid-template-rows: auto auto;
+  gap: 1.5rem;
+}
+
+/* Main Product Card */
+.product-main {
+  grid-column: 1;
+  grid-row: span 2;
+}
+
+.product-image-large {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.product-image-large img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+}
+
+.image-placeholder {
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+}
+
+.product-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.product-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #f8fafc;
+  letter-spacing: -0.025em;
+}
+
+.product-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.delete-btn {
+  color: #f87171;
+}
+
+.delete-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* Status Banner */
+.status-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.status-banner.below {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.status-banner.enough {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+
+.status-banner h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.status-banner p {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+/* QR Section */
+.qr-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.qr-icon {
+  width: 56px;
+  height: 56px;
+  background: rgba(168, 85, 247, 0.15);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a855f7;
+}
+
+.qr-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.qr-label {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.qr-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #f8fafc;
+  font-family: monospace;
+}
+
+/* Quantity Panel */
+.quantity-panel {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.quantity-panel h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #f8fafc;
+  margin-bottom: 1.5rem;
+}
+
+.quantity-display {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+  border-radius: 16px;
+  margin-bottom: 1.5rem;
+}
+
+.quantity-label {
+  display: block;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+}
+
+.quantity-value {
+  display: block;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #f8fafc;
+  line-height: 1;
+}
+
+.quantity-unit {
+  display: block;
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-top: 0.5rem;
+}
+
+.quantity-controls {
+  margin-bottom: 1.5rem;
+}
+
+.quantity-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 1rem;
+}
+
+.qty-btn {
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  background: rgba(30, 41, 59, 0.6);
+  color: #f8fafc;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.qty-btn.minus {
+  border-radius: 12px 0 0 12px;
+}
+
+.qty-btn.plus {
+  border-radius: 0 12px 12px 0;
+}
+
+.qty-btn:hover {
+  background: rgba(168, 85, 247, 0.2);
+  border-color: #a855f7;
+}
+
+.quantity-input {
+  flex: 1;
+  height: 48px;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-left: none;
+  border-right: none;
+  background: rgba(15, 23, 42, 0.6);
+  color: #f8fafc;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.quantity-input:focus {
+  outline: none;
+}
+
+.update-btn {
+  width: 100%;
+}
+
+.threshold-info {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.threshold-label {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.threshold-value {
+  color: #f8fafc;
+  font-weight: 600;
+}
+
+/* Positions Panel */
+.positions-panel {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.positions-panel .card-header {
+  margin-bottom: 1rem;
+}
+
+.btn.small {
+  padding: 0.5rem 0.875rem;
+  font-size: 0.85rem;
+}
+
+.positions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.empty-positions {
+  text-align: center;
+  padding: 2rem;
+  color: #64748b;
+}
+
+.empty-positions p {
+  margin-top: 0.5rem;
+}
+
+.position-item {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 12px;
+}
+
+.position-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(168, 85, 247, 0.15);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a855f7;
+  flex-shrink: 0;
+}
+
+.position-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.position-name {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #f8fafc;
+  margin-bottom: 0.5rem;
+}
+
+.position-bar {
+  height: 6px;
+  background: rgba(148, 163, 184, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.position-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #a855f7 0%, #6366f1 100%);
+  border-radius: 3px;
+}
+
+.position-percentage {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #a855f7;
+  flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .product-detail-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .product-main {
+    grid-row: 1;
+  }
+  
+  .quantity-panel {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  
+  .positions-panel {
+    grid-column: 1;
+    grid-row: 3;
+  }
+}
