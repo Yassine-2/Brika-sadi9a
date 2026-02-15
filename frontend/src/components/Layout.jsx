@@ -8,7 +8,8 @@ import {
   LogOut,
   Warehouse,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Truck
 } from 'lucide-react';
 import { useState } from 'react';
 import '../styles/layout.css';
@@ -23,10 +24,13 @@ const Layout = () => {
     navigate('/login');
   };
 
+  const isIndustrialMode = user?.modes?.includes('industrial');
+
   const navItems = [
     { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { path: '/products', icon: Package, label: 'Products' },
     { path: '/tasks', icon: ClipboardList, label: 'Tasks' },
+    ...(isIndustrialMode ? [{ path: '/forklifters', icon: Truck, label: 'Forklifters' }] : []),
     { path: '/settings', icon: Settings, label: 'Settings' },
   ];
 

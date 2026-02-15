@@ -9,11 +9,12 @@ from app.database import get_db
 from app.models import Product, ProductPosition, User, ThresholdStatus
 from app.schemas import (
     ProductCreate, ProductUpdate, ProductResponse,
-    ProductPositionCreate, ProductPositionResponse
+    ProductPositionCreate, ProductPositionResponse,
+    QuantityUpdateRequest
 )
-from app.auth import require_business_mode
+from app.auth import require_any_mode
 
-router = APIRouter(prefix="/products", tags=["Products - Business Mode"])
+router = APIRouter(prefix="/products", tags=["Products"])
 
 
 def generate_qr_code(data: str) -> str:
@@ -50,15 +51,27 @@ def generate_qr_code(data: str) -> str:
 def create_product(
     product: ProductCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_business_mode)
+    current_user: User = Depends(require_any_mode)
 ):
     """Create a new product with auto-generated QR code"""
     # Generate unique QR code identifier
     qr_code_id = f"PROD-{uuid.uuid4().hex[:8].upper()}"
     qr_code_image = generate_qr_code(qr_code_id)
     
+    # Validate positions - each position can have max 9 units
+    MAX_UNITS = 9
+    for pos in product.positions:
+        if pos.units < 0 or pos.units > MAX_UNITS:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Units per position must be between 0 and {MAX_UNITS}"
+            )
+    
+    # Calculate total quantity from positions
+    total_quantity = sum(pos.units for pos in product.positions) if product.positions else product.quantity
+    
     # Determine threshold status
-    threshold_status = ThresholdStatus.BELOW if product.quantity < product.threshold else ThresholdStatus.ENOUGH
+    threshold_status = ThresholdStatus.BELOW if total_quantity < product.threshold else ThresholdStatus.ENOUGH
     
     # Create product
     db_product = Product(
@@ -66,19 +79,21 @@ def create_product(
         image=product.image,
         qr_code=qr_code_id,
         qr_code_image=qr_code_image,
-        quantity=product.quantity,
+        quantity=total_quantity,
         threshold=product.threshold,
         threshold_status=threshold_status
     )
     db.add(db_product)
     db.flush()  # Get the product ID
     
-    # Add positions
+    # Add positions with calculated percentage
     for pos in product.positions:
+        percentage = (pos.units / MAX_UNITS) * 100 if pos.units > 0 else 0
         db_position = ProductPosition(
             product_id=db_product.id,
             position=pos.position,
-            percentage=pos.percentage
+            units=pos.units,
+            percentage=percentage
         )
         db.add(db_position)
     
@@ -93,7 +108,7 @@ def get_products(
     limit: int = 100,
     below_threshold: bool = None,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_business_mode)
+    current_user: User = Depends(require_any_mode)
 ):
     """Get all products with optional filtering"""
     query = db.query(Product)
@@ -112,7 +127,7 @@ def get_products(
 def get_product(
     product_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_business_mode)
+    current_user: User = Depends(require_any_mode)
 ):
     """Get a specific product by ID"""
     product = db.query(Product).filter(Product.id == product_id).first()
@@ -128,7 +143,7 @@ def get_product(
 def get_product_by_qr(
     qr_code: str,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_business_mode)
+    current_user: User = Depends(require_any_mode)
 ):
     """Get a product by its QR code"""
     product = db.query(Product).filter(Product.qr_code == qr_code).first()
@@ -145,7 +160,7 @@ def update_product(
     product_id: int,
     product_update: ProductUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_business_mode)
+    current_user: User = Depends(require_any_mode)
 ):
     """Update a product"""
     db_product = db.query(Product).filter(Product.id == product_id).first()
@@ -202,7 +217,7 @@ def update_product(
 def delete_product(
     product_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_business_mode)
+    current_user: User = Depends(require_any_mode)
 ):
     """Delete a product"""
     db_product = db.query(Product).filter(Product.id == product_id).first()
@@ -222,7 +237,7 @@ def add_product_position(
     product_id: int,
     position: ProductPositionCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_business_mode)
+    current_user: User = Depends(require_any_mode)
 ):
     """Add a position to a product"""
     db_product = db.query(Product).filter(Product.id == product_id).first()
@@ -246,11 +261,15 @@ def add_product_position(
 @router.put("/{product_id}/quantity")
 def update_product_quantity(
     product_id: int,
-    quantity_change: int,
+    request: QuantityUpdateRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_business_mode)
+    current_user: User = Depends(require_any_mode)
 ):
-    """Update product quantity (positive to add, negative to subtract)"""
+    """Update product quantity with position tracking
+    
+    Each position can hold max 9 units. When adding/removing quantity,
+    the position's units and percentage are updated accordingly.
+    """
     db_product = db.query(Product).filter(Product.id == product_id).first()
     if not db_product:
         raise HTTPException(
@@ -258,22 +277,63 @@ def update_product_quantity(
             detail="Product not found"
         )
     
-    new_quantity = db_product.quantity + quantity_change
+    # Get the position
+    db_position = db.query(ProductPosition).filter(
+        ProductPosition.id == request.position_id,
+        ProductPosition.product_id == product_id
+    ).first()
+    
+    if not db_position:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Position not found for this product"
+        )
+    
+    # Calculate new units for position
+    new_position_units = db_position.units + request.quantity_change
+    
+    # Validate position capacity
+    if new_position_units < 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Cannot remove more units than available at this position (current: {db_position.units})"
+        )
+    
+    if new_position_units > ProductPosition.MAX_UNITS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Position can hold maximum {ProductPosition.MAX_UNITS} units (current: {db_position.units})"
+        )
+    
+    # Calculate new total quantity
+    new_quantity = db_product.quantity + request.quantity_change
     if new_quantity < 0:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Quantity cannot be negative"
+            detail="Total quantity cannot be negative"
         )
     
+    # Update position
+    db_position.units = new_position_units
+    db_position.update_percentage()
+    
+    # Update product quantity
     db_product.quantity = new_quantity
     db_product.update_threshold_status()
     
     db.commit()
     db.refresh(db_product)
+    db.refresh(db_position)
     
     return {
         "product_id": db_product.id,
         "name": db_product.name,
         "quantity": db_product.quantity,
-        "threshold_status": db_product.threshold_status.value
+        "threshold_status": db_product.threshold_status.value,
+        "position": {
+            "id": db_position.id,
+            "position": db_position.position,
+            "units": db_position.units,
+            "percentage": db_position.percentage
+        }
     }

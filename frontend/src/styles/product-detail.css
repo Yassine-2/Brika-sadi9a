@@ -18,7 +18,7 @@
 }
 
 .back-button:hover {
-  color: #f8fafc;
+  color: var(--text-primary);
 }
 
 .product-detail-grid {
@@ -65,7 +65,7 @@
 .product-title {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--text-primary);
   letter-spacing: -0.025em;
 }
 
@@ -120,7 +120,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: rgba(15, 23, 42, 0.5);
+  background: var(--bg-tertiary);
   border-radius: 12px;
   padding: 1rem;
 }
@@ -152,13 +152,13 @@
 
 .qr-label {
   font-size: 0.8rem;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .qr-value {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #f8fafc;
+  color: var(--text-primary);
   font-family: monospace;
 }
 
@@ -171,7 +171,7 @@
 .quantity-panel h2 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #f8fafc;
+  color: var(--text-primary);
   margin-bottom: 1.5rem;
 }
 
@@ -186,7 +186,7 @@
 .quantity-label {
   display: block;
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: var(--text-secondary);
   margin-bottom: 0.5rem;
 }
 
@@ -194,14 +194,14 @@
   display: block;
   font-size: 3rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--text-primary);
   line-height: 1;
 }
 
 .quantity-unit {
   display: block;
   font-size: 0.9rem;
-  color: #64748b;
+  color: var(--text-muted);
   margin-top: 0.5rem;
 }
 
@@ -209,19 +209,64 @@
   margin-bottom: 1.5rem;
 }
 
+.quantity-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
 .quantity-input-group {
   display: flex;
   align-items: center;
   gap: 0;
-  margin-bottom: 1rem;
+  flex: 1;
+}
+
+.position-select {
+  flex: 1;
+  height: 48px;
+  padding: 0 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.position-select:focus {
+  outline: none;
+  border-color: #a855f7;
+}
+
+.quantity-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  color: #f87171;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.position-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
 
 .qty-btn {
   width: 48px;
   height: 48px;
-  border: 1px solid rgba(148, 163, 184, 0.15);
-  background: rgba(30, 41, 59, 0.6);
-  color: #f8fafc;
+  border: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -245,11 +290,11 @@
 .quantity-input {
   flex: 1;
   height: 48px;
-  border: 1px solid rgba(148, 163, 184, 0.15);
+  border: 1px solid var(--border-color);
   border-left: none;
   border-right: none;
-  background: rgba(15, 23, 42, 0.6);
-  color: #f8fafc;
+  background: var(--bg-input);
+  color: var(--text-primary);
   font-size: 1.25rem;
   font-weight: 600;
   text-align: center;
@@ -271,12 +316,12 @@
 }
 
 .threshold-label {
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 0.9rem;
 }
 
 .threshold-value {
-  color: #f8fafc;
+  color: var(--text-primary);
   font-weight: 600;
 }
 
@@ -304,7 +349,7 @@
 .empty-positions {
   text-align: center;
   padding: 2rem;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .empty-positions p {
@@ -316,7 +361,7 @@
   align-items: center;
   gap: 0.875rem;
   padding: 0.875rem;
-  background: rgba(15, 23, 42, 0.5);
+  background: var(--bg-tertiary);
   border-radius: 12px;
 }
 
@@ -337,12 +382,25 @@
   min-width: 0;
 }
 
+.position-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
 .position-name {
-  display: block;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #f8fafc;
-  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.position-units {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
 }
 
 .position-bar {

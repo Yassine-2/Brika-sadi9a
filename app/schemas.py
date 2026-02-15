@@ -63,7 +63,8 @@ class TokenData(BaseModel):
 # ============ Product Position Schemas ============
 class ProductPositionBase(BaseModel):
     position: str
-    percentage: float
+    percentage: float = 0
+    units: int = 0  # Number of units at this position (max 9)
 
 
 class ProductPositionCreate(ProductPositionBase):
@@ -75,6 +76,12 @@ class ProductPositionResponse(ProductPositionBase):
 
     class Config:
         from_attributes = True
+
+
+# Schema for quantity update with position
+class QuantityUpdateRequest(BaseModel):
+    quantity_change: int  # Positive to add, negative to remove
+    position_id: int  # The position ID where the change happens
 
 
 # ============ Product Schemas ============
@@ -206,3 +213,57 @@ class RaspberryPiCommandResponse(BaseModel):
     status: str
     result: Optional[dict] = None
     error: Optional[str] = None
+
+
+# ============ Forklift Schemas (Industrial Mode) ============
+class ForkliftState(str, Enum):
+    SANE = "sane"
+    TROUBLE = "trouble"
+
+
+class ForkliftBase(BaseModel):
+    name: str
+    state: ForkliftState = ForkliftState.SANE
+    last_maintenance: Optional[datetime] = None
+    next_maintenance: Optional[datetime] = None
+    has_ongoing_task: bool = False
+    position: Optional[str] = None
+    image: Optional[str] = None
+    video_url: Optional[str] = None
+
+
+class ForkliftCreate(BaseModel):
+    name: str
+    state: ForkliftState = ForkliftState.SANE
+    last_maintenance: Optional[datetime] = None
+    position: Optional[str] = None
+    image: Optional[str] = None
+    video_url: Optional[str] = "http://172.17.86.17/"
+
+
+class ForkliftUpdate(BaseModel):
+    name: Optional[str] = None
+    state: Optional[ForkliftState] = None
+    last_maintenance: Optional[datetime] = None
+    has_ongoing_task: Optional[bool] = None
+    position: Optional[str] = None
+    image: Optional[str] = None
+    video_url: Optional[str] = None
+
+
+class ForkliftResponse(ForkliftBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ForkliftSummary(BaseModel):
+    total: int
+    sane_count: int
+    trouble_count: int
+    free_count: int
+    busy_count: int
+    closest_maintenance: Optional[datetime] = None

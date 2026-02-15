@@ -115,6 +115,16 @@ def require_mode(required_mode: str):
     return mode_checker
 
 
+async def require_any_mode(current_user: User = Depends(get_current_active_user)):
+    """Allow access for users with either business or industrial mode"""
+    if not current_user.modes or len(current_user.modes) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User does not have any access mode"
+        )
+    return current_user
+
+
 # Convenience dependencies for mode access
 require_business_mode = require_mode("business")
 require_industrial_mode = require_mode("industrial")

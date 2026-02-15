@@ -3,7 +3,7 @@ import { X, Plus, Trash2, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 import { productsAPI, tasksAPI } from '../services/api';
 import '../styles/modals.css';
 
-const AddTaskModal = ({ isOpen, onClose, onSuccess }) => {
+const AddTaskModal = ({ isOpen, onClose, onTaskCreated, products: externalProducts }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [items, setItems] = useState([{ product_id: '', quantity_needed: 1, task_type: 'out' }]);
@@ -13,14 +13,19 @@ const AddTaskModal = ({ isOpen, onClose, onSuccess }) => {
 
   useEffect(() => {
     if (isOpen) {
-      loadProducts();
+      // Use external products if provided, otherwise load them
+      if (externalProducts && externalProducts.length > 0) {
+        setProducts(externalProducts);
+      } else {
+        loadProducts();
+      }
       // Reset form
       setTitle('');
       setDescription('');
       setItems([{ product_id: '', quantity_needed: 1, task_type: 'out' }]);
       setError('');
     }
-  }, [isOpen]);
+  }, [isOpen, externalProducts]);
 
   const loadProducts = async () => {
     try {
@@ -69,7 +74,7 @@ const AddTaskModal = ({ isOpen, onClose, onSuccess }) => {
           task_type: item.task_type
         }))
       });
-      onSuccess?.();
+      onTaskCreated?.();
       onClose();
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to create task');

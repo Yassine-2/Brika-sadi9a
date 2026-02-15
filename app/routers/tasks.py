@@ -8,16 +8,16 @@ from app.schemas import (
     TaskCreate, TaskUpdate, TaskResponse,
     TaskItemCreate, TaskItemUpdate, TaskItemResponse
 )
-from app.auth import require_business_mode
+from app.auth import require_any_mode
 
-router = APIRouter(prefix="/tasks", tags=["Tasks - Business Mode"])
+router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
 
 @router.post("/", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
 def create_task(
     task: TaskCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_business_mode)
+    current_user: User = Depends(require_any_mode)
 ):
     """Create a new task with items"""
     # Create task
@@ -59,7 +59,7 @@ def get_tasks(
     limit: int = 100,
     state: TaskState = None,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_business_mode)
+    current_user: User = Depends(require_any_mode)
 ):
     """Get all tasks with optional state filtering"""
     query = db.query(Task)
@@ -75,7 +75,7 @@ def get_tasks(
 def get_task(
     task_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_business_mode)
+    current_user: User = Depends(require_any_mode)
 ):
     """Get a specific task by ID"""
     task = db.query(Task).filter(Task.id == task_id).first()
@@ -92,7 +92,7 @@ def update_task(
     task_id: int,
     task_update: TaskUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_business_mode)
+    current_user: User = Depends(require_any_mode)
 ):
     """Update a task"""
     db_task = db.query(Task).filter(Task.id == task_id).first()
@@ -118,7 +118,7 @@ def update_task(
 def delete_task(
     task_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_business_mode)
+    current_user: User = Depends(require_any_mode)
 ):
     """Delete a task"""
     db_task = db.query(Task).filter(Task.id == task_id).first()
@@ -138,7 +138,7 @@ def add_task_item(
     task_id: int,
     item: TaskItemCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_business_mode)
+    current_user: User = Depends(require_any_mode)
 ):
     """Add an item to a task"""
     # Verify task exists
@@ -181,7 +181,7 @@ def update_task_item(
     item_id: int,
     item_update: TaskItemUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_business_mode)
+    current_user: User = Depends(require_any_mode)
 ):
     """Update a task item"""
     db_item = db.query(TaskItem).filter(
@@ -218,7 +218,7 @@ def complete_task_item(
     task_id: int,
     item_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_business_mode)
+    current_user: User = Depends(require_any_mode)
 ):
     """Mark a task item as finished and update product quantity"""
     db_item = db.query(TaskItem).filter(
@@ -278,7 +278,7 @@ def delete_task_item(
     task_id: int,
     item_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_business_mode)
+    current_user: User = Depends(require_any_mode)
 ):
     """Delete a task item"""
     db_item = db.query(TaskItem).filter(

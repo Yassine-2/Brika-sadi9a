@@ -1,7 +1,7 @@
-from sqlalchemy import Column, Integer, String, Boolean, Float, ForeignKey, Enum, Text, DateTime, Table
+from sqlalchemy import Column, Integer, String, Boolean, Float, ForeignKey, Enum, Text, DateTime, Table, Date
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import JSONB
-from datetime import datetime
+from datetime import datetime, timedelta
 import enum
 
 from app.database import Base
@@ -26,6 +26,11 @@ class TaskState(str, enum.Enum):
 class ThresholdStatus(str, enum.Enum):
     BELOW = "below"
     ENOUGH = "enough"
+
+
+class ForkliftState(str, enum.Enum):
+    SANE = "sane"
+    TROUBLE = "trouble"
 
 
 # Association table for User modes
@@ -61,9 +66,16 @@ class ProductPosition(Base):
     id = Column(Integer, primary_key=True, index=True)
     product_id = Column(Integer, ForeignKey('products.id'), nullable=False)
     position = Column(String(100), nullable=False)  # e.g., "A1-B2", "Shelf-3-Row-1"
-    percentage = Column(Float, nullable=False)  # Percentage of product at this position
+    percentage = Column(Float, nullable=False)  # Percentage based on units (units/3 * 100)
+    units = Column(Integer, default=0)  # Number of product units at this position (max 3)
     
     product = relationship("Product", back_populates="positions")
+    
+    MAX_UNITS = 9  # Each position can hold max 9 products
+    
+    def update_percentage(self):
+        """Update percentage based on units (max 9 per position)"""
+        self.percentage = (self.units / self.MAX_UNITS) * 100
 
 
 class Product(Base):
@@ -84,7 +96,7 @@ class Product(Base):
     positions = relationship("ProductPosition", back_populates="product", cascade="all, delete-orphan")
     
     # Relationship to task items
-    task_items = relationship("TaskItem", back_populates="product")
+    task_items = relationship("TaskItem", back_populates="product", cascade="all, delete-orphan")
 
     def update_threshold_status(self):
         """Update threshold status based on current quantity"""
@@ -145,3 +157,25 @@ class RaspberryPiDevice(Base):
     is_online = Column(Boolean, default=False)
     last_seen = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class Forklift(Base):
+    """Represents a forklift in the warehouse (Industrial Mode)"""
+    __tablename__ = "forklifts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False)  # e.g., "Forklift-01"
+    state = Column(Enum(ForkliftState), default=ForkliftState.SANE)  # sane or trouble
+    last_maintenance = Column(Date, nullable=True)
+    next_maintenance = Column(Date, nullable=True)  # 3 months after last_maintenance
+    has_ongoing_task = Column(Boolean, default=False)  # free or has task
+    position = Column(String(100), nullable=True)  # Position in warehouse map
+    image = Column(Text, nullable=True)  # URL or base64 image
+    video_url = Column(Text, nullable=True)  # Video feed URL
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def schedule_next_maintenance(self):
+        """Set next maintenance 3 months after last maintenance"""
+        if self.last_maintenance:
+            self.next_maintenance = self.last_maintenance + timedelta(days=90)

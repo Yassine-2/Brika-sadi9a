@@ -279,11 +279,11 @@
 }
 
 .info-label {
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .info-value {
-  color: #f8fafc;
+  color: var(--text-primary);
   font-weight: 500;
 }
 

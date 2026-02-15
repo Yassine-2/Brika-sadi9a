@@ -22,13 +22,9 @@ const Register = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const toggleMode = (mode) => {
-    const modes = formData.modes.includes(mode)
-      ? formData.modes.filter(m => m !== mode)
-      : [...formData.modes, mode];
-    
-    if (modes.length === 0) return; // At least one mode required
-    setFormData({ ...formData, modes });
+  const selectMode = (mode) => {
+    // Single mode selection only - replace existing mode
+    setFormData({ ...formData, modes: [mode] });
   };
 
   const handleSubmit = async (e) => {
@@ -140,12 +136,12 @@ const Register = () => {
           </div>
 
           <div className="form-group">
-            <label>Access Modes</label>
+            <label>Access Mode</label>
             <div className="mode-selector">
               <button
                 type="button"
                 className={`mode-option ${formData.modes.includes('business') ? 'active' : ''}`}
-                onClick={() => toggleMode('business')}
+                onClick={() => selectMode('business')}
               >
                 {formData.modes.includes('business') && <Check size={16} />}
                 Business
@@ -153,12 +149,13 @@ const Register = () => {
               <button
                 type="button"
                 className={`mode-option ${formData.modes.includes('industrial') ? 'active' : ''}`}
-                onClick={() => toggleMode('industrial')}
+                onClick={() => selectMode('industrial')}
               >
                 {formData.modes.includes('industrial') && <Check size={16} />}
                 Industrial
               </button>
             </div>
+            <span className="mode-hint">Select one mode for your account</span>
           </div>
 
           {error && <div className="auth-error">{error}</div>}

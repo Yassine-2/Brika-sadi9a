@@ -9,6 +9,7 @@ import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
 import Tasks from './pages/Tasks';
 import Settings from './pages/Settings';
+import Forklifters from './pages/Forklifters';
 import './App.css';
 
 // Protected Route wrapper
@@ -89,6 +90,7 @@ function App() {
             <Route path="products" element={<Products />} />
             <Route path="products/:id" element={<ProductDetail />} />
             <Route path="tasks" element={<Tasks />} />
+            <Route path="forklifters" element={<Forklifters />} />
             <Route path="settings" element={<Settings />} />
           </Route>
 

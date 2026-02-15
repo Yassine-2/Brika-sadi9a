@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import engine, Base
-from app.routers import auth, products, tasks, raspberry_pi
+from app.routers import auth, products, tasks, raspberry_pi, forklifts
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -27,6 +27,7 @@ app.include_router(auth.router)
 app.include_router(products.router)
 app.include_router(tasks.router)
 app.include_router(raspberry_pi.router)
+app.include_router(forklifts.router)
 
 
 @app.get("/")

@@ -46,7 +46,10 @@ export const productsAPI = {
   getByQR: (qrCode) => api.get(`/products/qr/${qrCode}`),
   create: (data) => api.post('/products/', data),
   update: (id, data) => api.put(`/products/${id}`, data),
-  updateQuantity: (id, change) => api.put(`/products/${id}/quantity?quantity_change=${change}`),
+  updateQuantity: (id, quantityChange, positionId) => api.put(`/products/${id}/quantity`, {
+    quantity_change: quantityChange,
+    position_id: positionId
+  }),
   delete: (id) => api.delete(`/products/${id}`),
   addPosition: (id, data) => api.post(`/products/${id}/positions`, data),
 };
@@ -72,6 +75,19 @@ export const raspberryPiAPI = {
   updateDevice: (deviceId, data) => api.put(`/raspberry-pi/devices/${deviceId}`, data),
   deleteDevice: (deviceId) => api.delete(`/raspberry-pi/devices/${deviceId}`),
   sendCommand: (data) => api.post('/raspberry-pi/command', data),
+};
+
+// Forklifts API (Industrial Mode)
+export const forkliftsAPI = {
+  getAll: (params) => api.get('/forklifts/', { params }),
+  getById: (id) => api.get(`/forklifts/${id}`),
+  getSummary: () => api.get('/forklifts/summary'),
+  create: (data) => api.post('/forklifts/', data),
+  update: (id, data) => api.put(`/forklifts/${id}`, data),
+  delete: (id) => api.delete(`/forklifts/${id}`),
+  recordMaintenance: (id) => api.post(`/forklifts/${id}/maintenance`),
+  assignTask: (id) => api.post(`/forklifts/${id}/assign-task`),
+  completeTask: (id) => api.post(`/forklifts/${id}/complete-task`),
 };
 
 export default api;
