@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus, AlertTriangle, Package, ArrowRight, X, Truck, CheckCircle2, Wrench, Play, Calendar } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
 import { productsAPI, tasksAPI, forkliftsAPI } from '../services/api';
@@ -42,12 +42,40 @@ const Dashboard = () => {
   const [selectedForklift, setSelectedForklift] = useState(null);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [forkliftPositions, setForkliftPositions] = useState({});
+  
+  // Raspberry Pi sensor alert state
+  const [sensorAlert, setSensorAlert] = useState(null); // { message: string } or null
+  const [alertedForkliftId, setAlertedForkliftId] = useState(null);
+  const alertedForkliftRef = useRef(null);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    alertedForkliftRef.current = alertedForkliftId;
+  }, [alertedForkliftId]);
 
   const isIndustrialMode = user?.modes?.includes('industrial');
 
   useEffect(() => {
     loadData();
   }, []);
+
+  // Poll Raspberry Pi for sensor status
+  useEffect(() => {
+    if (!isIndustrialMode) return;
+
+    // MOCK: Alert forklift3 (index 0) when it reaches third position
+    const mockAlert = () => {
+      if (forklifts.length > 0) {
+        setSensorAlert({ message: "Back Detector Alerted!" });
+        setAlertedForkliftId(forklifts[0].id); // forklift3 is index 0
+      }
+    };
+    
+    // Trigger mock alert after 5 seconds (time for forklift to reach third position)
+    const mockTimeout = setTimeout(mockAlert, 5000);
+    
+    return () => clearTimeout(mockTimeout);
+  }, [isIndustrialMode, forklifts]);
 
   // Smooth animation effect for forklifts
   useEffect(() => {
@@ -90,6 +118,11 @@ const Dashboard = () => {
         const newPositions = { ...prev };
 
         Object.keys(animationState).forEach(forkliftId => {
+          // Skip animation for alerted forklift
+          if (alertedForkliftRef.current && String(alertedForkliftRef.current) === String(forkliftId)) {
+            return;
+          }
+          
           const state = animationState[forkliftId];
           const path = FORKLIFT_PATHS[state.pathKey];
 
@@ -300,6 +333,10 @@ const Dashboard = () => {
                   <div className="legend-color blinking trouble"></div>
                   Trouble
                 </span>
+                <span className="legend-item">
+                  <div className="legend-color blinking sensor-alert"></div>
+                  Sensor Alert
+                </span>
               </div>
             ) : (
               <div className="map-legend">
@@ -330,20 +367,31 @@ const Dashboard = () => {
                   {forklifts.map((forklift) => {
                     const pos = forkliftPositions[forklift.id];
                     if (!pos) return null;
+                    
+                    const isAlerted = alertedForkliftId === forklift.id;
+                    const forkliftState = isAlerted ? 'sensor-alert' : forklift.state;
+                    const title = isAlerted 
+                      ? `${forklift.name} - SENSOR ALERT` 
+                      : `${forklift.name} - ${forklift.state === 'sane' ? 'Operational' : 'Trouble'}`;
 
                     return (
                       <div
                         key={forklift.id}
-                        className={`forklift-point ${forklift.state} ${forklift.video_url ? 'clickable' : ''}`}
+                        className={`forklift-point ${forkliftState} ${forklift.video_url ? 'clickable' : ''}`}
                         style={{
                           left: `${pos.x}%`,
                           top: `${pos.y}%`
                         }}
                         onClick={() => forklift.video_url && openForkliftVideo(forklift)}
-                        title={`${forklift.name} - ${forklift.state === 'sane' ? 'Operational' : 'Trouble'}`}
+                        title={title}
                       >
                         <span className="point-pulse"></span>
                         <Truck size={12} />
+                        {isAlerted && sensorAlert && (
+                          <div className="sensor-alert-tooltip">
+                            {sensorAlert.message}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -388,7 +436,13 @@ const Dashboard = () => {
               
               {/* Position Details Popup */}
               {selectedPosition && (
-                <div className="position-popup">
+                <div 
+                  className="position-popup"
+                  style={{
+                    top: `${(selectedPosition.y / 100) * 100}%`,
+                    left: `${((selectedPosition.x + 22) / 100) * 50}%`
+                  }}
+                >
                   <div className="popup-header">
                     <h4>Position {selectedPosition.id}</h4>
                     <button className="popup-close" onClick={() => setSelectedPosition(null)}>

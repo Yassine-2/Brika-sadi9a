@@ -56,6 +56,11 @@
   grid-row: 1;
 }
 
+.warehouse-map-card .card-header {
+  justify-content: flex-start;
+  gap: 2rem;
+}
+
 .map-legend {
   display: flex;
   gap: 1rem;
@@ -80,10 +85,12 @@
   border-radius: 0 0 12px 12px;
   padding: 0;
   position: relative;
+  display: flex;
+  align-items: flex-start;
 }
 
 .map-svg {
-  width: 100%;
+  width: 50%;
   height: auto;
   min-height: 300px;
   display: block;
@@ -104,9 +111,6 @@
 /* Position Popup */
 .position-popup {
   position: absolute;
-  top: 50%;
-  right: 1rem;
-  transform: translateY(-50%);
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 12px;
@@ -466,6 +470,13 @@
   animation: troublePulse 1.5s ease-in-out infinite;
 }
 
+.forklift-point.sensor-alert {
+  background: rgba(251, 146, 60, 0.95);
+  color: white;
+  box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.35);
+  animation: sensorAlertPulse 0.8s ease-in-out infinite;
+}
+
 .point-pulse {
   position: absolute;
   width: 100%;
@@ -480,6 +491,50 @@
 
 .forklift-point.trouble .point-pulse {
   background: rgba(248, 113, 113, 0.4);
+}
+
+.forklift-point.sensor-alert .point-pulse {
+  background: rgba(251, 146, 60, 0.4);
+}
+
+/* Sensor Alert Tooltip */
+.sensor-alert-tooltip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 8px;
+  background: rgba(251, 146, 60, 0.95);
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(251, 146, 60, 0.4);
+  animation: tooltipFadeIn 0.3s ease;
+}
+
+.sensor-alert-tooltip::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-bottom-color: rgba(251, 146, 60, 0.95);
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 @keyframes pulsate {
@@ -502,6 +557,15 @@
   }
 }
 
+@keyframes sensorAlertPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(251, 146, 60, 0.2);
+  }
+}
+
 /* Legend blinking indicators */
 .legend-color.blinking {
   position: relative;
@@ -517,6 +581,11 @@
   animation: blinkTrouble 1s infinite;
 }
 
+.legend-color.blinking.sensor-alert {
+  background: #fb923c;
+  animation: blinkSensorAlert 0.8s infinite;
+}
+
 @keyframes blinkSane {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
@@ -525,6 +594,11 @@
 @keyframes blinkTrouble {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
+}
+
+@keyframes blinkSensorAlert {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 /* Forklift Summary Cards */

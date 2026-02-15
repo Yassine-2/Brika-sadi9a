@@ -150,30 +150,16 @@ const AddProductModal = ({ isOpen, onClose, onProductCreated }) => {
             />
           </div>
 
-          <div className="form-row-2">
-            <div className="form-group">
-              <label>Total Quantity</label>
-              <input
-                type="number"
-                value={totalQuantity}
-                readOnly
-                disabled
-                className="quantity-readonly"
-              />
-              <span className="form-hint">Calculated from positions</span>
-            </div>
-
-            <div className="form-group">
-              <label>Low Stock Threshold</label>
-              <input
-                type="number"
-                name="threshold"
-                min="0"
-                value={formData.threshold}
-                onChange={handleChange}
-              />
-              <span className="form-hint">Alert when stock falls below this</span>
-            </div>
+          <div className="form-group">
+            <label>Low Stock Threshold</label>
+            <input
+              type="number"
+              name="threshold"
+              min="0"
+              value={formData.threshold}
+              onChange={handleChange}
+            />
+            <span className="form-hint">Alert when stock falls below this</span>
           </div>
 
           <div className="form-group">
