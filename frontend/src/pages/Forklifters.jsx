@@ -357,9 +357,10 @@ const Forklifters = () => {
               </button>
             </div>
             <div className="video-container">
+              {/* Processed stream with QR detection from FastAPI */}
               <img
-                src="http://192.168.1.185:5001/video_feed"
-                alt={`${selectedForklift.name} live feed`}
+                src="http://localhost:8000/video/feed"
+                alt={`${selectedForklift.name} live feed with QR detection`}
                 className="video-stream"
               />
             </div>

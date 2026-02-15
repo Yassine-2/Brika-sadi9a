@@ -155,6 +155,18 @@ def get_product_by_qr(
     return product
 
 
+@router.get("/qr-public/{qr_code}")
+def get_product_by_qr_public(
+    qr_code: str,
+    db: Session = Depends(get_db)
+):
+    """Public endpoint to get product name by QR code (for video processor)"""
+    product = db.query(Product).filter(Product.qr_code == qr_code).first()
+    if not product:
+        return {"name": qr_code, "found": False}
+    return {"name": product.name, "id": product.id, "found": True}
+
+
 @router.put("/{product_id}", response_model=ProductResponse)
 def update_product(
     product_id: int,

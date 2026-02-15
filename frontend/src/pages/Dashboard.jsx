@@ -560,19 +560,12 @@ const Dashboard = () => {
                   </button>
                 </div>
                 <div className="video-container">
-                  {selectedForklift.video_url ? (
-                    // Use direct stream from camera laptop
-                    <img
-                      src="http://192.168.1.185:5001/video_feed"
-                      alt={`${selectedForklift.name} live feed`}
-                      className="video-stream"
-                    />
-                  ) : (
-                    <div className="no-video">
-                      <Play size={48} />
-                      <p>No video feed available</p>
-                    </div>
-                  )}
+                  {/* Processed stream with QR detection from FastAPI */}
+                  <img
+                    src="http://localhost:8000/video/feed"
+                    alt={`${selectedForklift.name} live feed with QR detection`}
+                    className="video-stream"
+                  />
                 </div>
               </div>
             </div>
